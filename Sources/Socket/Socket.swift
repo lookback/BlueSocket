@@ -26,10 +26,6 @@
 
 import Foundation
 
-func cast<S, T>(_ ptr: S) -> T {
-	return unsafeBitCast(ptr, to: T.self)
-}
-
 // MARK: Socket
 
 ///
@@ -3068,9 +3064,10 @@ public class Socket: SocketReader, SocketWriter {
 		if data.count == 0 {
 			return 0
 		}
-		return try data.withUnsafeBytes() { [unowned self] (buffer: UnsafeRawBufferPointer) throws -> Int in
 
-			return try self.write(from: cast(buffer), bufSize: data.count)
+		return try data.withUnsafeBytes() { [unowned self] (buffer: UnsafePointer<UInt8>) throws -> Int in
+
+			return try self.write(from: buffer, bufSize: data.count)
 		}
 	}
 
@@ -3196,9 +3193,9 @@ public class Socket: SocketReader, SocketWriter {
 	@discardableResult public func write(from data: Data, to address: Address) throws -> Int {
 
 		// Send the bytes...
-		return try data.withUnsafeBytes() { [unowned self] (buffer: UnsafeRawBufferPointer) throws -> Int in
+		return try data.withUnsafeBytes() { [unowned self] (buffer: UnsafePointer<UInt8>) throws -> Int in
 
-			return try self.write(from: cast(buffer), bufSize: data.count, to: address)
+			return try self.write(from: buffer, bufSize: data.count, to: address)
 		}
 	}
 
